@@ -8,10 +8,9 @@ import play.api.mvc._
   * Twilio when it requests them (e.g. in resonse to receiving a call)
   */
 
-object TwiML extends Controller {
-
+object TwiML extends Controller with TwiMLController {
   def twTest = Action {
     val res = new TwiMLResponse()
-    Ok(res.toXML)
+    res
   }
 }
