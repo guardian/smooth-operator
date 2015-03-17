@@ -1,0 +1,3 @@
+GET       /healthcheck                  controllers.Management.healthcheck
+
+GET       /test                         controllers.TwiML.twTest
