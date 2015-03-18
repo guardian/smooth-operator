@@ -28,4 +28,4 @@ It is built using the official Twilio
 To use it, just run it by doing something like `sbt run` and then you
 need to configure Twilio to ping the URL that your app is listening
 on. As this URL needs to be accessible to the internet, a good tool
-for testing it with is (ngrok)[http://ngrok.com/].
+for testing it with is [ngrok](http://ngrok.com/).
