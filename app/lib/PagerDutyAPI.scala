@@ -7,12 +7,16 @@ import play.api.Play.{current, configuration}
 class PagerDutyAPI(authToken: String, base: String, apiVersion: String = "v1") {
   require(base.startsWith("https"), "Please don't use Pager Duty without HTTPS")
 
-  def authHeader = ("Authorization" -> s"Token token=$authToken")
+  private def authHeader = ("Authorization" -> s"Token token=$authToken")
 
-  def request(path: String) = WS.url(s"$base/api/$apiVersion/$path").withHeaders(authHeader)
+  private def request(path: String) = WS.url(s"$base/api/$apiVersion/$path").withHeaders(authHeader)
 
-  def submit(path: String) = request(path).execute
+  private def submit(path: String) = request(path).execute
 
+  /**
+    *  https://developer.pagerduty.com/documentation/rest/schedules/users
+    */
+  def whoIsOn(scheduleId: String) = submit(s"schedules/$scheduleId/users")
 }
 
 object PagerDutyAPI {
