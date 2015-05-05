@@ -7,7 +7,7 @@ import play.api.Play.{current, configuration}
 class PagerDutyAPI(authToken: String, base: String, apiVersion: String = "v1") {
   require(base.startsWith("https"), "Please don't use Pager Duty without HTTPS")
 
-  def authHeader = ("Authorization" -> "Token token=$authToken")
+  def authHeader = ("Authorization" -> s"Token token=$authToken")
 
   def request(path: String) = WS.url(s"$base/api/$apiVersion/$path").withHeaders(authHeader)
 
