@@ -8,5 +8,6 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 libraryDependencies ++= Seq(
   "com.twilio.sdk" % "twilio-java-sdk" % "3.4.5",
-  "com.typesafe.play" %% "play-ws" % "2.3.8"
+  "com.typesafe.play" %% "play-ws" % "2.3.8",
+  "joda-time" % "joda-time" % "2.7"
 )
