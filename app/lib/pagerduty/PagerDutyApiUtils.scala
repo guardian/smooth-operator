@@ -21,7 +21,8 @@ trait PagerDutyApiUtils extends Status {
   protected def submit(path: String, params: (String, String)*)(implicit ec: ExecutionContext) =
     request(path).withQueryString(params: _*).execute
 
-  protected def submitJson(path: String, params: (String, String)*)(implicit ec: ExecutionContext):
+  protected def submitJson(path: String, params: (String, String)*)
+                          (implicit ec: ExecutionContext):
       Future[Either[String, JsValue]] =
     submit(path, params: _*).map { response =>
       if(response.status == OK) Right(response.json) else Left(getError(response.json))
