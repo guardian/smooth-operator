@@ -18,14 +18,13 @@ trait PagerDutyApiUtils extends Status {
 
   protected def request(path: String) = WS.url(s"$baseUrl/api/$apiVersion/$path").withHeaders(authHeader)
 
-  protected def submit(path: String, params: (String, String)*)(implicit ec: ExecutionContext) =
-    request(path).withQueryString(params: _*).execute
+  protected def submit(path: String, params: (String, String)*)(implicit ec: ExecutionContext):
+      Future[WSResponse] = request(path).withQueryString(params: _*).execute
 
   protected def submitJson(path: String, params: (String, String)*)
-                          (implicit ec: ExecutionContext):
-      Future[Either[String, JsValue]] =
+                          (implicit ec: ExecutionContext): Future[JsValue] =
     submit(path, params: _*).map { response =>
-      if(response.status == OK) Right(response.json) else Left(getError(response.json))
+      if(response.status == OK) response.json else throw getError(response.json)
     }
 
   /**
@@ -33,10 +32,13 @@ trait PagerDutyApiUtils extends Status {
     *  an error (see:
     *  https://developer.pagerduty.com/documentation/rest/errors
     */
-  private def getError(err: JsValue): String = {
+  private def getError(err: JsValue): PagerDutyApiError = {
     val mainMsg = (err \ "error" \ "message").as[String]
-    val otherMsgs = (err \ "error" \ "errors").toString
-    s"PagerDuty Error: ${mainMsg}; ${otherMsgs}"
+    val otherMsgs = (err \ "error" \ "errors") match {
+      case JsArray(errs)  => "; " + errs.map(_.toString).mkString("; ")
+      case _ => ""
+    }
+    PagerDutyApiError(s"PagerDuty Error: ${mainMsg}${otherMsgs}")
   }
 
 }
