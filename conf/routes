@@ -3,3 +3,5 @@ GET       /healthcheck                  controllers.Management.healthcheck
 GET       /forward                      controllers.TwiML.twForwardCall
 
 GET       /whoson                       controllers.PagerDuty.whoson
+
+GET       /contact                      controllers.PagerDuty.contact

@@ -10,6 +10,18 @@ import scala.concurrent.{ExecutionContext, Future}
 import JsonImplicits._
 
 class PagerDutyAPI(val authToken: String, val baseUrl: String) extends PagerDutyApiUtils {
+
+  // finds out who is on-call now for a given schedule, and returns a
+  // list of users with a contact number
+  def whoYaGonnaCall(scheduleId: String)(implicit ec: ExecutionContext):
+      Future[Seq[UserWithNumber]] = {
+    whoIsOn(scheduleId) map { users => users.map(contactNumber(_.id)) }
+
+      val numresult = result.right map
+      { users => Future.traverse(users)(user => contactNumber(user.id)) }
+    }
+  }
+
   /**
     *  https://developer.pagerduty.com/documentation/rest/schedules/users
     */

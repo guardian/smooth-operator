@@ -17,4 +17,11 @@ object PagerDuty extends Controller {
       case err: PagerDutyApiError => InternalServerError(err.toString)
     }
   }
+
+  def contact = Action.async {
+    pg.contactNumber("PQU2X2D") map {
+      case Some(num) => Ok(s"Contact num: $num\n")
+      case None      => InternalServerError("Cannot find contact number")
+    }
+  }
 }
