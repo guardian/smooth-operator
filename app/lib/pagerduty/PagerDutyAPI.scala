@@ -10,6 +10,25 @@ import scala.concurrent.{ExecutionContext, Future}
 import JsonImplicits._
 
 class PagerDutyAPI(val authToken: String, val baseUrl: String) extends PagerDutyApiUtils {
+
+  // finds out who is on-call now for a given schedule, and returns a
+  // list of users with a contact number
+  def whoYaGonnaCall(scheduleId: String)(implicit ec: ExecutionContext):
+      Future[Either[String, Seq[UserWithNumber]]] = {
+    val usersFuture: Future[Either[String, Seq[User]]] = whoIsOn(scheduleId)
+    usersFuture flatMap { result =>
+      // now we have an either which represents the (possibly failing)
+      // result from getting the user from the schedule. If it was
+      // successful we want to take that list of users and lookup the
+      // contact number for each one
+
+      val numberFutures = result.right map { userList => userList.map(contactNumber(_.id)) }
+
+      val numresult = result.right map
+      { users => Future.traverse(users)(user => contactNumber(user.id)) }
+    }
+  }
+
   /**
     *  https://developer.pagerduty.com/documentation/rest/schedules/users
     */

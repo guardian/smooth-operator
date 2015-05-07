@@ -10,12 +10,19 @@ import lib.OperatorConfig.defaultExecutionContext
 object PagerDuty extends Controller {
   val pg = PagerDutyAPI.default
   def whoson = Action.async {
-    val id = configuration.getString("pagerduty.schedule_id").get
-    pg.whoIsOn(id) map {
+    val schedId = configuration.getString("pagerduty.schedule_id").get
+    pg.whoIsOn(schedId) map {
       case Right(users) =>
         Ok(users.mkString(", ") + "\n")
       case Left(err) =>
         InternalServerError(err)
+    }
+  }
+
+  def contact = Action.async {
+    pg.contactNumber("PQU2X2D") map {
+      case Right(contact) => Ok(contact)
+      case Left(err)      => InternalServerError(err)
     }
   }
 }
