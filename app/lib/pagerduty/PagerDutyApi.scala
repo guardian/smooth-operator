@@ -14,11 +14,11 @@ class PagerDutyApi(val authToken: String, val baseUrl: String) extends PagerDuty
 
   // finds out who is on-call now for a given schedule, and returns a
   // list of users with a contact number
-  def whoYaGonnaCall(scheduleId: String)(implicit ec: ExecutionContext):
+  def whoYaGonnaCall(scheduleId: String, allowSms: Boolean = true)(implicit ec: ExecutionContext):
       Future[Seq[User]] = {
     whoIsOn(scheduleId) flatMap { users =>
       Future.traverse(users) { user =>
-        contactNumber(user.id) map {
+        contactNumber(user.id, allowSms) map {
           number => user.copy(number = number)
         }
       }
@@ -55,7 +55,8 @@ class PagerDutyApi(val authToken: String, val baseUrl: String) extends PagerDuty
     whoIsOn(scheduleId, start, end)
   }
 
-  def contactNumber(userId: String)(implicit ec: ExecutionContext): Future[Option[String]] = {
+  def contactNumber(userId: String, allowSms: Boolean = true)
+                   (implicit ec: ExecutionContext): Future[Option[String]] = {
     Logger.info(s"Searching for contact number for user id $userId")
     submitJson(s"users/$userId/contact_methods") map { json =>
       (json \ "contact_methods").validate[Seq[ContactMethod]] match {
@@ -65,7 +66,7 @@ class PagerDutyApi(val authToken: String, val baseUrl: String) extends PagerDuty
             case ContactMethod(_, "phone", Some(num)) =>
               Logger.info(s"Success (found a phone number)")
               num
-            case ContactMethod(_, "SMS", Some(num)) =>
+            case ContactMethod(_, "SMS", Some(num)) if allowSms =>
               Logger.info(s"Success (found an SMS number)")
               num
           }

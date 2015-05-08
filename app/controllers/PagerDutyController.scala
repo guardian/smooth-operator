@@ -11,6 +11,7 @@ import lib.OperatorConfig.defaultExecutionContext
 object PagerDutyController extends Controller {
   val pg = PagerDutyAPI.default
   val schedId = configuration.getString("pagerduty.schedule_id").get
+  val allowSms = configuration.getBoolean("pagerduty.allow_sms").getOrElse(true)
 
   object PagerDutyApiAction extends ActionBuilder[Request] {
     // detects PagerDuty errors and returns internal server error
@@ -26,7 +27,7 @@ object PagerDutyController extends Controller {
   }
 
   def contact = PagerDutyApiAction.async {
-    pg.whoYaGonnaCall(schedId) map { users =>
+    pg.whoYaGonnaCall(schedId, allowSms) map { users =>
       // get all of the numbers that are present
       val withNums = users.collect {
         case User(_, _, Some(num)) => num
