@@ -2,9 +2,7 @@ package lib.pagerduty
 
 import play.api.libs.json.JsError
 
-sealed class PagerDutyApiError(val msg: String) extends Throwable {
-  override def toString = msg
-}
+sealed class PagerDutyApiError(val msg: String) extends Throwable(msg)
 
 object PagerDutyApiError {
   def apply(msg: String) = new PagerDutyApiError(msg)
