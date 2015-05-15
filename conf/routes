@@ -1,3 +1,3 @@
 GET       /healthcheck                  controllers.Management.healthcheck
 
-GET       /forward                      controllers.TwiML.twForwardCall
+GET       /forward                      controllers.TwiML.forwardCall
